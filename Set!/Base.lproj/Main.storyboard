@@ -298,6 +298,7 @@
                         <viewLayoutGuide key="safeArea" id="6Tk-OE-BBY"/>
                     </view>
                     <connections>
+                        <outlet property="dealMoreButton" destination="5SW-p5-jpr" id="FYs-87-Zbe"/>
                         <outlet property="scoreLabel" destination="nDs-cz-Hza" id="ygF-ES-ZR7"/>
                         <outletCollection property="cardButtons" destination="4Qx-Am-BDP" collectionClass="NSMutableArray" id="J3Y-GH-eBA"/>
                         <outletCollection property="cardButtons" destination="lR1-2J-LGC" collectionClass="NSMutableArray" id="ZNf-5J-0iO"/>

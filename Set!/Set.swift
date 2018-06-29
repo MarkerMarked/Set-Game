@@ -15,21 +15,60 @@ struct Set {
     let numberOfCards = 81
     private(set) var cardsInDeck = [Card]()
     private(set) var cardsPlayed = [Card]()
-    private(set) var cardsSelected = [Card]()
-    private(set) var isMatch = false
+    private(set) var cardsSelected = [Int : Card]()
+    var isMatch: Bool {
+        guard cardsSelected.count == 3 else { return false }
+        
+        //Fake return code
+        return true
+    }
     private(set) var cardsMatched = [Card]()
     
-    mutating func checkSelectedCard(set: (Card, Card, Card)) -> Bool {
+    mutating func selectCard(at buttonIndex: Int) {
         
-        return isMatch
+        if cardsSelected[buttonIndex] == cardsPlayed[buttonIndex] && cardsSelected.count < 3 {
+            cardsSelected.removeValue(forKey: buttonIndex)
+            return
+        } else if cardsSelected[buttonIndex] == cardsPlayed[buttonIndex] && cardsSelected.count == 3 {
+            return
+        }
+        
+        if cardsSelected.count < 2 {
+            cardsSelected[buttonIndex] = cardsPlayed[buttonIndex]
+        } else if cardsSelected.count == 2 {
+            cardsSelected[buttonIndex] = cardsPlayed[buttonIndex]
+            //Check for match
+            if isMatch {            //IS match
+                
+            }
+        } else {
+            if isMatch {
+                dealNewCards()
+                for matchIndex in cardsSelected.indices {
+                    cardsMatched.append(cardsSelected[matchIndex].value)
+                }
+            }
+            cardsSelected.removeAll()       //Remove all selected cards
+            cardsSelected[buttonIndex] = cardsPlayed[buttonIndex]     //Reselect new first card
+            
+        }
     }
     
-    //Returns a tuple with THREE 'Card's that are removed from cardsInDeck and added to cardsPlayed.
-    mutating func dealNewCards() -> (Card, Card, Card)? {
-        if cardsInDeck.count == 0 { return nil }
-        let drawnCards = (cardsInDeck.remove(at: cardsInDeck.count.random),cardsInDeck.remove(at: cardsInDeck.count.random) ,cardsInDeck.remove(at: cardsInDeck.count.random))
-        cardsPlayed.append(drawnCards)
-        return drawnCards
+
+    
+    mutating func dealNewCards() {
+        guard cardsInDeck.count != 0 else { return }
+        if isMatch {
+            //Place new 3 cards in index spots of cardsSelected
+            for index in cardsSelected.indices {
+                cardsPlayed.remove(at: cardsPlayed.index(of: cardsSelected[index].value)!)
+                cardsPlayed.insert(cardsInDeck.remove(at: cardsInDeck.count.random), at: cardsSelected[index].key)
+            }
+            cardsSelected.removeAll()
+        }
+        else {
+            cardsPlayed.append((cardsInDeck.remove(at: cardsInDeck.count.random),cardsInDeck.remove(at: cardsInDeck.count.random) ,cardsInDeck.remove(at: cardsInDeck.count.random)))
+        }
     }
     
     init() {
@@ -58,7 +97,6 @@ struct Card: Hashable {
     static func == (lhs: Card, rhs: Card) -> Bool {
         return lhs.identifier == rhs.identifier
     }
-    
     let identifier: Int
     let colorSetting: colorType
     let shapeSetting: shapeType
