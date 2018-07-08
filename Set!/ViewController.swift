@@ -9,14 +9,11 @@ import UIKit
 
 class ViewController: UIViewController {
 
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        dealMoreButton.layer.cornerRadius = 8.0
-        for index in cardButtons.indices {
-            cardButtons[index].layer.cornerRadius = 8.0
-            cardButtons[index].layer.borderWidth = 4.0
+    var dateOfLastMatch = Date()
+    var score = 0 {
+        didSet {
+            scoreLabel.text = "Score: \(score)"
         }
-        updateView()
     }
     
     var game = Set()
@@ -27,6 +24,8 @@ class ViewController: UIViewController {
     
     @IBAction func pressNewGame(_ sender: UIButton) {
         game = Set()
+        score = 0
+        dateOfLastMatch = Date()
         updateView()
     }
     
@@ -36,24 +35,43 @@ class ViewController: UIViewController {
         updateView()
     }
     
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        dealMoreButton.layer.cornerRadius = 8.0
+        for index in cardButtons.indices {
+            cardButtons[index].layer.cornerRadius = 8.0
+            cardButtons[index].layer.borderWidth = 4.0
+        }
+        updateView()
+    }
+    
     @IBAction func pressCard(_ sender: UIButton) {
-        game.selectCard(at: cardButtons.index(of: sender)!)
+        game.select(card: game.cardsPlayed[cardButtons.firstIndex(of: sender)!])
+        if game.cardsSelected.count == 3 && !game.isMatch {
+            score -= 10
+        }
         updateView()
     }
     
     func updateView () {
-        if game.cardsInDeck.count != 0 && (game.cardsPlayed.count < 24 || game.isMatch) {
-            dealMoreButton.backgroundColor = #colorLiteral(red: 0.8355803517, green: 0.9736485354, blue: 1, alpha: 1)
+        //Update score - Receive 0-30 points depending on how long it took to match a set
+        if game.isMatch {
+            let timeSinceLastMatch = dateOfLastMatch.timeIntervalSinceNow
+            if (30-Int(abs(timeSinceLastMatch.magnitude))) > 0 { score += (30-Int(abs(timeSinceLastMatch.magnitude))) }
+            dateOfLastMatch = Date()
+        }
+        //Update 'dealMoreButton' based on 'Number in Deck', 'Number on UI', and 'Match Status'
+        if game.deck.numberInDeck != 0 && (game.cardsPlayed.count < 24 || game.isMatch) {
+            dealMoreButton.backgroundColor = #colorLiteral(red: 0.9999960065, green: 1, blue: 1, alpha: 1)
             dealMoreButton.isEnabled = true
         } else {
             dealMoreButton.isEnabled = false
-            dealMoreButton.backgroundColor = #colorLiteral(red: 1, green: 0.1491314173, blue: 0, alpha: 1)
+            dealMoreButton.backgroundColor = #colorLiteral(red: 0.9999960065, green: 1, blue: 1, alpha: 0.5)
         }
         
         for buttonIndex in cardButtons.indices {
             let button = cardButtons[buttonIndex]
             if game.cardsPlayed.count > buttonIndex {
-                
                 //Configure NSAttributes
                 var attributes = [NSAttributedString.Key:Any]()
                 //Configure cardsPlayed onto buttons
@@ -114,17 +132,21 @@ class ViewController: UIViewController {
         }
         
         for selectedIndex in game.cardsSelected.indices {
-            let button = cardButtons[game.cardsSelected[selectedIndex].key]
+            let button = cardButtons[game.cardsPlayed.firstIndex(of: game.cardsSelected[selectedIndex])!]
             button.layer.borderColor = #colorLiteral(red: 0.1764705926, green: 0.01176470611, blue: 0.5607843399, alpha: 1)
             
             if game.isMatch {
                 button.layer.backgroundColor = #colorLiteral(red: 0.4666666687, green: 0.7647058964, blue: 0.2666666806, alpha: 1)
             }
+            
+            if game.cardsSelected.count == 3 && !game.isMatch {
+                button.layer.backgroundColor = #colorLiteral(red: 1, green: 0.7526777961, blue: 0.7518366721, alpha: 1)
+            }
         }
         //Check if card is in MatchList
-        for index in game.cardsMatched.indices {
-            if game.cardsPlayed.contains(game.cardsMatched[index]) {
-                let button = cardButtons[game.cardsPlayed.index(of: game.cardsMatched[index])!]
+        for matchIndex in game.cardsMatched.indices {
+            if game.cardsPlayed.contains(game.cardsMatched[matchIndex]) {
+                let button = cardButtons[game.cardsPlayed.index(of: game.cardsMatched[matchIndex])!]
                 button.backgroundColor = #colorLiteral(red: 0, green: 0, blue: 0, alpha: 1)
                 button.isEnabled = false
                 button.setAttributedTitle(NSAttributedString(string: ""), for: UIControl.State.normal)
@@ -132,5 +154,6 @@ class ViewController: UIViewController {
         }
     }
 }
+
 
 

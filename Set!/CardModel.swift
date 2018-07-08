@@ -26,6 +26,55 @@ struct Card: Hashable {
     let shadeSetting: shadeType
     let countSetting: countType
     
+    //Returns TRUE if all three cards are ALL SAME or ALL DIFFERENT color, false if 2x type, 1x other type.
+    static func compareColor(of cardSet: (Card, Card, Card)) -> Bool {
+        let (cardOne, cardTwo, cardThree) = cardSet
+        if cardOne.colorSetting == cardTwo.colorSetting && cardOne.colorSetting == cardThree.colorSetting {
+            return true
+        } else if cardOne.colorSetting != cardTwo.colorSetting && cardOne.colorSetting != cardThree.colorSetting && cardTwo.colorSetting != cardThree.colorSetting{
+            return true
+        } else {
+            return false
+        }
+    }
+    
+    //Returns TRUE if all three cards are ALL SAME or ALL DIFFERENT shape, false if 2x type, 1x other type.
+    static func compareShape(of cardSet: (Card, Card, Card)) -> Bool {
+        let (cardOne, cardTwo, cardThree) = cardSet
+        if cardOne.shapeSetting == cardTwo.shapeSetting && cardOne.shapeSetting == cardThree.shapeSetting {
+            return true
+        } else if cardOne.shapeSetting != cardTwo.shapeSetting && cardOne.shapeSetting != cardThree.shapeSetting && cardTwo.shapeSetting != cardThree.shapeSetting{
+            return true
+        } else {
+            return false
+        }
+    }
+    
+    //Returns TRUE if all three cards are ALL SAME or ALL DIFFERENT shade, false if 2x type, 1x other type.
+    static func compareShade(of cardSet: (Card, Card, Card)) -> Bool {
+        let (cardOne, cardTwo, cardThree) = cardSet
+        if cardOne.shadeSetting == cardTwo.shadeSetting && cardOne.shadeSetting == cardThree.shadeSetting {
+            return true
+        } else if cardOne.shadeSetting != cardTwo.shadeSetting && cardOne.shadeSetting != cardThree.shadeSetting && cardTwo.shadeSetting != cardThree.shadeSetting{
+            return true
+        } else {
+            return false
+        }
+    }
+    
+    //Returns TRUE if all three cards are ALL SAME or ALL DIFFERENT count, false if 2x type, 1x other type.
+    static func compareCount(of cardSet: (Card, Card, Card)) -> Bool {
+        let (cardOne, cardTwo, cardThree) = cardSet
+        if cardOne.countSetting == cardTwo.countSetting && cardOne.countSetting == cardThree.countSetting {
+            return true
+        } else if cardOne.countSetting != cardTwo.countSetting && cardOne.countSetting != cardThree.countSetting && cardTwo.countSetting != cardThree.countSetting{
+            return true
+        } else {
+            return false
+        }
+    }
+    
+    
     init(with cardIndex: Int, colorType colorIndex: Int, shapeType shapeIndex: Int, shadeType shadeIndex: Int, countType countIndex: Int){
         identifier = cardIndex
         colorSetting = colorType(rawValue: colorIndex)!

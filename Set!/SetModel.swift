@@ -16,64 +16,64 @@ struct Set {
     private(set) var cardsMatched = [Card]()
     var isMatch: Bool {
         guard cardsSelected.count == 3 else { return false }
-        
-        //FAKE RETURN TRUE
-        return true
+        let cardSet: (cardOne: Card, cardTwo: Card, cardThree: Card) = (cardsSelected[0], cardsSelected[1], cardsSelected[2])
+        if Card.compareColor(of: cardSet) && Card.compareCount(of: cardSet) && Card.compareShape(of: cardSet) && Card.compareShade(of: cardSet) {
+            return true
+        } else {
+            return false
+        }
     }
     
     mutating func select(card: Card) {
-        if cardsSelected[buttonIndex] == cardsPlayed[buttonIndex] && cardsSelected.count < 3 {
-            cardsSelected.removeValue(forKey: buttonIndex)
+        let cardSelectedIndex = cardsSelected.lastIndex(of: card)
+        
+        if cardsSelected.contains(card) && cardsSelected.count < 3 {
+            cardsSelected.remove(at: cardSelectedIndex!)
             return
-        } else if cardsSelected[buttonIndex] == cardsPlayed[buttonIndex] && cardsSelected.count == 3 {
-            return
+        } else if cardsSelected.contains(card) && cardsSelected.count == 3 {
+            if isMatch {
+                return
+            }
         }
         
-        if cardsSelected.count < 2 {
-            cardsSelected[buttonIndex] = cardsPlayed[buttonIndex]
-        } else if cardsSelected.count == 2 {
-            cardsSelected[buttonIndex] = cardsPlayed[buttonIndex]
-            //Check for match
-            if isMatch {            //IS match
-                
-            }
+        if cardsSelected.count < 3 {
+            cardsSelected.append(card)
+            return
         } else {
             if isMatch {
                 dealNewCards()
-                for matchIndex in cardsSelected.indices {
-                    cardsMatched.append(cardsSelected[matchIndex].value)
-                }
             }
             cardsSelected.removeAll()       //Remove all selected cards
-            cardsSelected[buttonIndex] = cardsPlayed[buttonIndex]     //Reselect new first card
-            
+            cardsSelected.append(card)     //Reselect new first card
         }
     }
     
     mutating func dealNewCards() {
-        if let (newCardOne, newCardTwo, newCardThree) = deck.drawThreeCards() {
-            
-        } else {
-            
-        }
-        
-        if isMatch {
-            //Place new 3 cards in index spots of cardsSelected
-            for index in cardsSelected.indices {
-                cardsPlayed.remove(at: cardsPlayed.index(of: cardsSelected[index].value)!)
-                cardsPlayed.insert(cardsInDeck.remove(at: cardsInDeck.count.random), at: cardsSelected[index].key)
+        if isMatch { cardsMatched.append(contentsOf: cardsSelected) }
+        if let drawCardCheck = deck.drawThreeCards() {
+            var newCards = [Card]()
+            newCards.append(drawCardCheck)
+            if isMatch {
+                //Place new 3 cards in index spots of cardsSelected
+                for selectedIndex in cardsSelected.indices {
+                    let replacementLocation = cardsPlayed.lastIndex(of: cardsSelected[selectedIndex])!
+                    cardsPlayed.remove(at: replacementLocation)
+                    cardsPlayed.insert(newCards[selectedIndex], at: replacementLocation)
+                }
+                cardsSelected.removeAll()
             }
-            cardsSelected.removeAll()
-        }
-        else {
-            
+            else {
+                cardsPlayed.append(contentsOf: newCards)
+            }
         }
     }
     
     init() {
         //Deal 12 cards randomly, remove from cardsInDeck and place in cardsPlayed
-        for _ in 0..<12 {
-            cardsPlayed.append(cardsInDeck.remove(at: cardsInDeck.count.random))
+        for _ in 1...4 {
+            cardsPlayed.append(deck.drawThreeCards()!)
         }
     }
 }
+
+
